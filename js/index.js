@@ -11,6 +11,8 @@ let centerY = canvas.height / 2;
 let running = false;
 let rectLY = [];
 let rectRY = [];
+let angle = 0;
+let audioLength = 0;
 
 // Create points
 for (let x = 0; x < 255; x++) {
@@ -44,8 +46,11 @@ function loadAudio() {
 	audio.crossOrigin = "anonymous";
 
 	audio.addEventListener("canplay", handleCanplay);
-	audio.src = "./ifeelforyou.mp3";
+	audio.src = "./eyeofthetiger.mp3";
 	audio.load();
+	audio.addEventListener("loadeddata", () => {
+		audioLength = audio.duration;
+	});
 	running = true;
 }
 
@@ -158,6 +163,7 @@ function draw(dt) {
 		update(dt);
 	}
 
+	ctx.save();
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	/********* DRAWING VERTICAL LINES *********/
 	// drawSquare(rectLY, "L");
@@ -168,30 +174,71 @@ function draw(dt) {
 	// drawText(rectRY);
 
 	/********* DRAWING SPINNING RECORD *******/
+	if (!audio.paused) {
+		newTime = audio.currentTime;
+	}
 	drawAlbumInfo();
 	drawSongInfo();
 	drawTimeUp();
-	drawRecord();
 	drawTimeLeft();
+	drawOuterRecord();
+	ctx.translate(canvas.width - 500, centerY);
+	ctx.rotate((Math.PI / 180) * angle);
+	ctx.translate(-(canvas.width - 500), -centerY);
+	drawRecordLine();
+	ctx.restore();
+	drawInnerRecord();
+	oldTime = audio.currentTime;
 }
 
 /**
  * Red circlea round the record that shows how much time is left
  * by reducing it's arc degrees
  */
-function drawTimeLeft() {}
-
-function drawRecord() {
-	/* vinyl part of record */
-	ctx.fillStyle = "#000000";
+function drawTimeLeft() {
+	let timeRemaining;
+	if (!audio.paused) {
+		timeRemaining = ((audioLength - audio.currentTime) / audioLength) * 360;
+	}
 	ctx.beginPath();
-	ctx.arc(canvas.width - 500, centerY, 200, 0, 2 * Math.PI);
-	ctx.fill();
+	ctx.arc(
+		canvas.width - 500,
+		centerY,
+		200,
+		0,
+		(timeRemaining * (2 * Math.PI)) / 360
+	);
+	ctx.lineWidth = 7;
+	ctx.strokeStyle = "#ff0000";
+	ctx.stroke();
+}
 
+function drawRecordLine() {
+	if (!audio.paused) {
+		angle += 2;
+	}
+	/* lines on record */
+	ctx.beginPath();
+	ctx.moveTo(canvas.width - 500, centerY);
+	ctx.lineTo(canvas.width - 300, canvas.height - 450);
+	ctx.strokeStyle = "#ff0000";
+	ctx.lineWidth = 1;
+	ctx.stroke();
+}
+
+function drawInnerRecord() {
 	/* center of record */
 	ctx.fillStyle = "#ffffff";
 	ctx.beginPath();
 	ctx.arc(canvas.width - 500, centerY, 50, 0, 2 * Math.PI);
+	ctx.fill();
+}
+
+function drawOuterRecord() {
+	/* vinyl part of record */
+	ctx.fillStyle = "#000000";
+	ctx.beginPath();
+	ctx.arc(canvas.width - 500, centerY, 200, 0, 2 * Math.PI);
 	ctx.fill();
 }
 
