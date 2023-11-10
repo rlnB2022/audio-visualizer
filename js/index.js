@@ -179,7 +179,7 @@ function draw() {
 function drawPlayOrPause() {
 	const text = audio.paused ? "Click to Play!" : "Click to Pause!";
 	ctx.font = "36px serif";
-	ctx.fillText(text, centerX - 100, 50);
+	ctx.fillText(text, canvas.width - 590, centerY + 130);
 }
 
 /**
