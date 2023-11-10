@@ -44,12 +44,12 @@ const audio = new Audio();
 
 const source = context.createMediaElementSource(audio);
 
-function loadAudio() {
+function loadAudio(fileName) {
 	audio.loop = false;
 	audio.autoplay = false;
 	audio.crossOrigin = "anonymous";
 
-	audio.src = "./eyeofthetiger.mp3";
+	audio.src = URL.createObjectURL(fileName);
 	audio.load();
 	audio.addEventListener("canplay", handleCanplay);
 	audio.addEventListener("loadeddata", () => {
@@ -77,9 +77,11 @@ function toggleAudio() {
 }
 
 canvas.addEventListener("click", () => {
-	context.resume().then(() => {
-		toggleAudio();
-	});
+	if (audioLoaded) {
+		context.resume().then(() => {
+			toggleAudio();
+		});
+	}
 });
 
 document.body.addEventListener("touchend", function (ev) {
@@ -337,5 +339,10 @@ function drawSongInfo() {
 	ctx.fillText("Name", 300, canvas.height / 2 + 125);
 }
 
-loadAudio();
 draw();
+
+const inputFile = document.querySelector("input[type=file]");
+inputFile.addEventListener("change", () => {
+	let music = document.querySelector("input[type=file]").files[0];
+	loadAudio(music);
+});
