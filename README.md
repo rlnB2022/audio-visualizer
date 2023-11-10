@@ -30,8 +30,4 @@ This project is created with:
 * I learned about saving and restoring the canvas so that I can make rotational changes, then put the canvas back to its original orientation so that other drawing methods will render correctly.
 * This project brought out my creative side. Adding the BG effect was something I thought would be interesting to see. I had to figure out how to change the background color dynamically, so I chose to add RGB based on the audio frequency.
 
-# Takeaways
-
-* 
-
 Thanks for reading!
