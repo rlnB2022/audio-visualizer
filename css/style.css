@@ -27,3 +27,25 @@ body {
 canvas {
 	display: block;
 }
+
+.add-song-container {
+	position: absolute;
+	bottom: 10%;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+button {
+	border: 1px solid #f76e2a;
+	outline: none;
+	padding: 15px;
+	border-radius: 5px;
+	background-color: #a71a5b;
+	color: #fff;
+	cursor: pointer;
+	transition: background-color 0.25s ease;
+}
+
+button:hover {
+	background-color: #a8547b;
+}
