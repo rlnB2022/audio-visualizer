@@ -21,14 +21,17 @@ This project is created with:
 # Problems Faced
 
 * I had to figure out how to draw each item I wanted on the screen, this included arcs, lines and text.
-* 
+* Some of the lines were not as 'strong' as others and would not display from behind the record. So, I had to create a minimum/maximum line length so that they would display properly.
+* I was getting errors when trying to play the song selected before it loaded, until I understood that I needed to resume the context, then toggle the Audio to play.
 
 # What I learned
 
-I learned that React is the library that was just made for me. I love it! Firestore databases are amazing. Coming from a SQL background, a noSQL database with documents wasn't as difficult as I thought it would be. Implementing React Redux to manage the state of the app was also not as difficult as I expected, either. At my current job, we used Flux, so it was easy to adapt and learn.
+* I think I'd like to learn more about canvas and what else I can do with it. I'd love to create options for other audio visualizations, like graphics and effects that remain on screen then within a few seconds - fade away.
+* I learned about saving and restoring the canvas so that I can make rotational changes, then put the canvas back to its original orientation so that other drawing methods will render correctly.
+* This project brought out my creative side. Adding the BG effect was something I thought would be interesting to see. I had to figure out how to change the background color dynamically, so I chose to add RGB based on the audio frequency.
 
 # Takeaways
 
-This was a really fun project to create. I finished working on this project September 26, 2021...late into the night. Deployed on Github Pages.
+* 
 
 Thanks for reading!
