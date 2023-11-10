@@ -177,9 +177,11 @@ function draw() {
  * Method to display either Play or Pause
  */
 function drawPlayOrPause() {
-	const text = audio.paused ? "Click to Play!" : "Click to Pause!";
-	ctx.font = "36px serif";
-	ctx.fillText(text, canvas.width - 590, centerY + 130);
+	if (audioLoaded) {
+		const text = audio.paused ? "Click to Play!" : "Click to Pause!";
+		ctx.font = "36px serif";
+		ctx.fillText(text, canvas.width - 590, centerY + 130);
+	}
 }
 
 /**
