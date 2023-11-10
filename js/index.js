@@ -16,6 +16,11 @@ let angle = 0;
 let audioLength = 0;
 let averageFreq = [0, 0, 0]; // RGB
 
+// media tags
+let jsmediatags = window.jsmediatags;
+let artistName = "";
+let songName = "";
+
 // Create points
 for (let x = 0; x < 255; x++) {
 	rectLY.push(0);
@@ -320,12 +325,12 @@ function drawAlbumInfo() {
 	// Album Header
 	ctx.font = "36px serif";
 	ctx.fillStyle = "#ffffff";
-	ctx.fillText("Album", 300, 100);
+	ctx.fillText("Artist", 300, 100);
 
 	// Album Name
 	ctx.font = "18px serif";
 	ctx.fillStyle = "#ffffff";
-	ctx.fillText("Name", 300, 125);
+	ctx.fillText(artistName, 300, 125);
 }
 
 function drawSongInfo() {
@@ -336,13 +341,25 @@ function drawSongInfo() {
 	// Song Name
 	ctx.font = "24px serif";
 	ctx.fillStyle = "#ffffff";
-	ctx.fillText("Name", 300, canvas.height / 2 + 125);
+	ctx.fillText(songName, 300, canvas.height / 2 + 125);
 }
 
 draw();
 
 const inputFile = document.querySelector("input[type=file]");
-inputFile.addEventListener("change", () => {
+inputFile.addEventListener("change", (event) => {
 	let music = document.querySelector("input[type=file]").files[0];
+	let tempFile = event.target.files[0];
+	jsmediatags.read(tempFile, {
+		onSuccess: function (tag) {
+			console.log(tag.tags);
+			artistName = tag.tags.artist;
+			songName = tag.tags.title;
+		},
+		onError: function (error) {
+			console.log(error);
+		},
+	});
 	loadAudio(music);
+	// get the name, artist and album name
 });
