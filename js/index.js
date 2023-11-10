@@ -194,16 +194,14 @@ function drawRecordVisualizer() {
 	for (let i = 0; i < 255; i++) {
 		let ada = audioDataArrayL[i] / 255;
 		const angle = (i / 255) * 2 * Math.PI;
-
-		const x = canvas.width - 500 + ada * 360 * Math.cos(angle) * 1.5;
-		const y = centerY + ada * 360 * Math.sin(angle) * 1.5;
+		const x = canvas.width - 500 + (0.56 + ada * 0.3) * 360 * Math.cos(angle);
+		const y = centerY + (0.56 + ada * 0.3) * 360 * Math.sin(angle);
 
 		ctx.beginPath();
 		ctx.moveTo(canvas.width - 500, centerY);
 		ctx.lineTo(x, y);
 		ctx.lineWidth = 5;
 		ctx.lineCap = "round";
-		ctx.stroke();
 
 		if (ada >= 0.8) {
 			ctx.strokeStyle = "#ff0000";
@@ -224,6 +222,7 @@ function drawRecordVisualizer() {
 		} else {
 			ctx.strokeStyle = "#00000000";
 		}
+		ctx.stroke();
 	}
 }
 
