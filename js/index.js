@@ -355,4 +355,10 @@ inputFile.addEventListener("change", (event) => {
 	loadAudio(music);
 });
 
+document.body.addEventListener("touchend", function (ev) {
+	context.resume().then(() => {
+		toggleAudio();
+	});
+});
+
 draw();
