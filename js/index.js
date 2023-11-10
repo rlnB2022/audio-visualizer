@@ -56,7 +56,6 @@ function loadAudio(fileName) {
 
 	audio.src = URL.createObjectURL(fileName);
 	audio.load();
-	audio.addEventListener("canplay", handleCanplay);
 	audio.addEventListener("loadeddata", () => {
 		audioLength = audio.duration;
 		audioLoaded = true;
@@ -64,13 +63,6 @@ function loadAudio(fileName) {
 		splitter.connect(context.destination);
 	});
 	running = true;
-}
-
-function handleCanplay() {
-	if (audioLoaded) {
-		// connect the audio element to the analyser node and the analyser node
-		// to the main Web Audio context
-	}
 }
 
 function toggleAudio() {
@@ -178,13 +170,17 @@ function update(dt) {
 	}
 }
 
-function draw(dt) {
+function draw() {
 	requestAnimationFrame(draw);
 
 	if (running) {
-		update(dt);
+		update();
 	}
 
+	ctx.save();
+	ctx.canvas.width = window.innerWidth;
+	ctx.canvas.height = window.innerHeight;
+	ctx.restore();
 	ctx.save();
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	/********* DRAWING VERTICAL LINES *********/
@@ -216,6 +212,15 @@ function draw(dt) {
 	bgColor.style.backgroundColor = `rgba(${Math.floor(
 		averageFreq[0]
 	)}, ${Math.floor(averageFreq[1])}, ${Math.floor(averageFreq[2])}, .3)`;
+
+	// draw center message to play or pause
+	drawPlayOrPause();
+}
+
+function drawPlayOrPause() {
+	const text = audio.paused ? "Click to Play!" : "Click to Pause!";
+	ctx.font = "36px serif";
+	ctx.fillText(text, centerX - 100, 50);
 }
 
 function drawRecordVisualizer() {
