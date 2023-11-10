@@ -46,7 +46,7 @@ function loadAudio() {
 	audio.crossOrigin = "anonymous";
 
 	audio.addEventListener("canplay", handleCanplay);
-	audio.src = "./eyeofthetiger.mp3";
+	audio.src = "./ifeelforyou.mp3";
 	audio.load();
 	audio.addEventListener("loadeddata", () => {
 		audioLength = audio.duration;
@@ -181,14 +181,66 @@ function draw(dt) {
 	drawSongInfo();
 	drawTimeUp();
 	drawTimeLeft();
+	if (!audio.paused) {
+		drawRecordVisualizer();
+	}
 	drawOuterRecord();
-	ctx.translate(canvas.width - 500, centerY);
-	ctx.rotate((Math.PI / 180) * angle);
-	ctx.translate(-(canvas.width - 500), -centerY);
 	drawRecordLine();
-	ctx.restore();
 	drawInnerRecord();
 	oldTime = audio.currentTime;
+}
+
+function drawRecordVisualizer() {
+	for (let i = 0; i < 255; i++) {
+		let ada = audioDataArrayL[i] / 255;
+		const angle = (i / 255) * 2 * Math.PI;
+
+		const x = canvas.width - 500 + ada * 360 * Math.cos(angle) * 2;
+		const y = centerY + ada * 360 * Math.sin(angle) * 2;
+
+		const lineLength = ada * 100;
+
+		ctx.beginPath();
+		ctx.moveTo(canvas.width - 500, centerY);
+		ctx.lineTo(x, y);
+		ctx.lineWidth = 2;
+		ctx.stroke();
+		// ctx.save();
+		// ctx.translate(canvas.width - 500, centerY);
+		// ctx.rotate(((i / 255) * 360 * (Math.PI * 2)) / 360);
+		// ctx.rotate((Math.PI / 180) * (i / 255) * 360);
+		// ctx.rotate((i / 255) * 360);
+		// ctx.rotate((0 * (Math.PI * 2)) / 360);
+		// ctx.translate(-(canvas.width - 500), -centerY);
+		// ctx.beginPath();
+		// ctx.moveTo(canvas.width - 500, centerY);
+		// ctx.lineTo(canvas.width - 300, ada * 200 + 500);
+		// ctx.lineWidth = 10;
+		// ctx.lineCap = "round";
+
+		if (ada >= 0.8) {
+			ctx.strokeStyle = "#ff0000";
+		} else if (ada >= 0.7 && ada < 0.8) {
+			ctx.strokeStyle = "#ff038e";
+		} else if (ada >= 0.6 && ada < 0.7) {
+			ctx.strokeStyle = "#ff05ff";
+		} else if (ada >= 0.5 && ada < 0.6) {
+			ctx.strokeStyle = "#a805ff";
+		} else if (ada >= 0.4 && ada < 0.5) {
+			ctx.strokeStyle = "#2605ff";
+		} else if (ada >= 0.3 && ada < 0.4) {
+			ctx.strokeStyle = "#05a3ff";
+		} else if (ada >= 0.2 && ada < 0.3) {
+			ctx.strokeStyle = "#05ff69";
+		} else if (ada >= 0.1 && ada < 0.2) {
+			ctx.strokeStyle = "#ffee05";
+		} else {
+			ctx.strokeStyle = "#00000000";
+		}
+		// ctx.closePath();
+		// ctx.stroke();
+		// ctx.restore();
+	}
 }
 
 /**
@@ -197,9 +249,7 @@ function draw(dt) {
  */
 function drawTimeLeft() {
 	let timeRemaining;
-	if (!audio.paused) {
-		timeRemaining = ((audioLength - audio.currentTime) / audioLength) * 360;
-	}
+	timeRemaining = ((audioLength - audio.currentTime) / audioLength) * 360;
 	ctx.beginPath();
 	ctx.arc(
 		canvas.width - 500,
@@ -217,13 +267,17 @@ function drawRecordLine() {
 	if (!audio.paused) {
 		angle += 2;
 	}
-	/* lines on record */
+	/* line on record */
+	ctx.translate(canvas.width - 500, centerY);
+	ctx.rotate((Math.PI / 180) * angle);
+	ctx.translate(-(canvas.width - 500), -centerY);
 	ctx.beginPath();
 	ctx.moveTo(canvas.width - 500, centerY);
 	ctx.lineTo(canvas.width - 300, canvas.height - 450);
 	ctx.strokeStyle = "#ff0000";
 	ctx.lineWidth = 1;
 	ctx.stroke();
+	ctx.restore();
 }
 
 function drawInnerRecord() {
