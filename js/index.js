@@ -9,10 +9,12 @@ canvas.height = document.body.clientHeight - 15;
 let centerX = canvas.width / 2;
 let centerY = canvas.height / 2;
 let running = false;
+let audioLoaded = false;
 let rectLY = [];
 let rectRY = [];
 let angle = 0;
 let audioLength = 0;
+let averageFreq = [0, 0, 0]; // RGB
 
 // Create points
 for (let x = 0; x < 255; x++) {
@@ -40,33 +42,33 @@ const audioDataArrayR = new Uint8Array(bufferLengthR);
 
 const audio = new Audio();
 
+const source = context.createMediaElementSource(audio);
+
 function loadAudio() {
 	audio.loop = false;
 	audio.autoplay = false;
 	audio.crossOrigin = "anonymous";
 
-	audio.addEventListener("canplay", handleCanplay);
-	audio.src = "./ifeelforyou.mp3";
+	audio.src = "./eyeofthetiger.mp3";
 	audio.load();
+	audio.addEventListener("canplay", handleCanplay);
 	audio.addEventListener("loadeddata", () => {
 		audioLength = audio.duration;
+		audioLoaded = true;
+		source.connect(splitter);
+		splitter.connect(context.destination);
 	});
 	running = true;
 }
 
 function handleCanplay() {
-	// connect the audio element to the analyser node and the analyser node
-	// to the main Web Audio context
-	const source = context.createMediaElementSource(audio);
-	source.connect(splitter);
-	splitter.connect(context.destination);
+	if (audioLoaded) {
+		// connect the audio element to the analyser node and the analyser node
+		// to the main Web Audio context
+	}
 }
 
 function toggleAudio() {
-	if (running === false) {
-		loadAudio();
-	}
-
 	if (audio.paused) {
 		audio.play();
 	} else {
@@ -74,7 +76,11 @@ function toggleAudio() {
 	}
 }
 
-canvas.addEventListener("click", toggleAudio);
+canvas.addEventListener("click", () => {
+	context.resume().then(() => {
+		toggleAudio();
+	});
+});
 
 document.body.addEventListener("touchend", function (ev) {
 	context.resume();
@@ -141,6 +147,7 @@ function drawSquare(points, audioSide) {
 function update(dt) {
 	let audioValueLY;
 	let audioValueRY;
+	averageFreq = [0, 0, 0];
 
 	// get the current audio data
 	analyserL.getByteFrequencyData(audioDataArrayL);
@@ -153,6 +160,14 @@ function update(dt) {
 
 		rectLY[i] = audioValueLY * canvas.height;
 		rectRY[i] = audioValueRY * canvas.height;
+
+		if (i < 85.3) {
+			averageFreq[0] += audioValueLY * 2;
+		} else if (i > 85.3 && i < 170.66) {
+			averageFreq[1] += audioValueLY * 2;
+		} else {
+			averageFreq[2] += audioValueLY * 2;
+		}
 	}
 }
 
@@ -188,6 +203,12 @@ function draw(dt) {
 	drawRecordLine();
 	drawInnerRecord();
 	oldTime = audio.currentTime;
+
+	// draw BG colors
+	const bgColor = document.querySelector(".bg-color");
+	bgColor.style.backgroundColor = `rgba(${Math.floor(
+		averageFreq[0]
+	)}, ${Math.floor(averageFreq[1])}, ${Math.floor(averageFreq[2])}, .3)`;
 }
 
 function drawRecordVisualizer() {
@@ -316,4 +337,5 @@ function drawSongInfo() {
 	ctx.fillText("Name", 300, canvas.height / 2 + 125);
 }
 
+loadAudio();
 draw();
