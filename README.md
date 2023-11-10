@@ -3,7 +3,7 @@ https://rlnb2022.github.io/audio-visualizer/index.html
 
 # Project Description
 
-I created this fun project to learn about the canvas and the HTML audio element. I've seen visualizers before and wanted to challenge myself to make one myself. To depict audio playing, I chose a spinning record. To show the audio visualizations, I wanted them to go completely around the record showing different colors as the frequencies changed. Adding a nice background color effect completed the challenge for me.
+I created this fun project to learn about the canvas and the HTML audio element. I've seen visualizers before and wanted to challenge myself to make one myself. To depict audio playing, I chose a spinning record. To show the audio visualizations, I wanted them to go completely around the record showing different colors as the frequencies changed. Adding a nice background color effect completed the challenge for me. Click the Choose a Song button to find a mp3 to load. Once loaded, click anywhere on the canvas to spin the record and listen to the song.
 
 (I tried to tone down the effect by lowering the opacity, so the background color changes weren't so jarring)
 
@@ -16,6 +16,7 @@ This project is created with:
 * HTML 5
 * CSS 3
 * Javascript
+* jsMediaTags - to get the metadata from the mp3
 
 # Problems Faced
 
