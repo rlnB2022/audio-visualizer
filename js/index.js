@@ -180,10 +180,10 @@ function draw(dt) {
 	drawAlbumInfo();
 	drawSongInfo();
 	drawTimeUp();
-	drawTimeLeft();
 	if (!audio.paused) {
 		drawRecordVisualizer();
 	}
+	drawTimeLeft();
 	drawOuterRecord();
 	drawRecordLine();
 	drawInnerRecord();
@@ -195,28 +195,15 @@ function drawRecordVisualizer() {
 		let ada = audioDataArrayL[i] / 255;
 		const angle = (i / 255) * 2 * Math.PI;
 
-		const x = canvas.width - 500 + ada * 360 * Math.cos(angle) * 2;
-		const y = centerY + ada * 360 * Math.sin(angle) * 2;
-
-		const lineLength = ada * 100;
+		const x = canvas.width - 500 + ada * 360 * Math.cos(angle) * 1.5;
+		const y = centerY + ada * 360 * Math.sin(angle) * 1.5;
 
 		ctx.beginPath();
 		ctx.moveTo(canvas.width - 500, centerY);
 		ctx.lineTo(x, y);
-		ctx.lineWidth = 2;
+		ctx.lineWidth = 5;
+		ctx.lineCap = "round";
 		ctx.stroke();
-		// ctx.save();
-		// ctx.translate(canvas.width - 500, centerY);
-		// ctx.rotate(((i / 255) * 360 * (Math.PI * 2)) / 360);
-		// ctx.rotate((Math.PI / 180) * (i / 255) * 360);
-		// ctx.rotate((i / 255) * 360);
-		// ctx.rotate((0 * (Math.PI * 2)) / 360);
-		// ctx.translate(-(canvas.width - 500), -centerY);
-		// ctx.beginPath();
-		// ctx.moveTo(canvas.width - 500, centerY);
-		// ctx.lineTo(canvas.width - 300, ada * 200 + 500);
-		// ctx.lineWidth = 10;
-		// ctx.lineCap = "round";
 
 		if (ada >= 0.8) {
 			ctx.strokeStyle = "#ff0000";
@@ -237,9 +224,6 @@ function drawRecordVisualizer() {
 		} else {
 			ctx.strokeStyle = "#00000000";
 		}
-		// ctx.closePath();
-		// ctx.stroke();
-		// ctx.restore();
 	}
 }
 
@@ -258,7 +242,7 @@ function drawTimeLeft() {
 		0,
 		(timeRemaining * (2 * Math.PI)) / 360
 	);
-	ctx.lineWidth = 7;
+	ctx.lineWidth = 10;
 	ctx.strokeStyle = "#ff0000";
 	ctx.stroke();
 }
