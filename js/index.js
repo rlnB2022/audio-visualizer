@@ -2,12 +2,15 @@
 let canvas = document.querySelector("canvas");
 let ctx = canvas.getContext("2d");
 
-// set the canvas height and width
-canvas.width = document.body.clientWidth;
-canvas.height = document.body.clientHeight - 15;
+// set the initial canvas height and width
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
+// set center of canvas
 let centerX = canvas.width / 2;
 let centerY = canvas.height / 2;
+
+// varialbes for data frequencies, audio controls, etc.
 let running = false;
 let audioLoaded = false;
 let rectLY = [];
@@ -27,28 +30,37 @@ for (let x = 0; x < 255; x++) {
 	rectRY.push(0);
 }
 
+// setup the context and splitter
 const context = new AudioContext();
 const splitter = context.createChannelSplitter();
 
+// create the analyser
 const analyserL = context.createAnalyser();
 const analyserR = context.createAnalyser();
 
+// setup values for frequency samples
 analyserL.fftSize = 8192;
 analyserR.fftSize = 8192;
 
+// connect the splitter
 splitter.connect(analyserL, 0, 0);
 splitter.connect(analyserR, 1, 0);
 
+// setup the frequencyBinCount (number of data points)
 const bufferLengthL = analyserL.frequencyBinCount;
 const bufferLengthR = analyserR.frequencyBinCount;
 
 const audioDataArrayL = new Uint8Array(bufferLengthL);
 const audioDataArrayR = new Uint8Array(bufferLengthR);
 
+// create the audio and the source
 const audio = new Audio();
-
 const source = context.createMediaElementSource(audio);
 
+/**
+ * Loads the audio, sets the duration, and tells the system it's ready to run when fully loaded
+ * @param {String} fileName
+ */
 function loadAudio(fileName) {
 	audio.loop = false;
 	audio.autoplay = false;
@@ -65,6 +77,9 @@ function loadAudio(fileName) {
 	running = true;
 }
 
+/**
+ * Method that simply changes between play and paused states
+ */
 function toggleAudio() {
 	if (audio.paused) {
 		audio.play();
@@ -73,6 +88,9 @@ function toggleAudio() {
 	}
 }
 
+/**
+ * Get user input by clicking on the canvas triggers the audio to play or pause
+ */
 canvas.addEventListener("click", () => {
 	if (audioLoaded) {
 		context.resume().then(() => {
@@ -81,69 +99,11 @@ canvas.addEventListener("click", () => {
 	}
 });
 
-document.body.addEventListener("touchend", function (ev) {
-	context.resume();
-});
-
-function drawText(points) {
-	let letters = ["J", "A", "V", "A", "S", "C", "R", "I", "P", "T"];
-
-	for (let i = 0; i < 10; i++) {
-		let ada = audioDataArrayL[i] / 255;
-
-		ctx.font = points[0] * ada + "px serif";
-		ctx.fillText(letters[i], 400 + i * 125, centerY);
-	}
-}
-
-// draw each of the frequency data integers
-// these represent the decibel value for a specific frequency
-function drawSquare(points, audioSide) {
-	let modifier = 0;
-	const rightSide = audioSide === "R";
-
-	if (rightSide) {
-		modifier = 500;
-	}
-	for (let i = 0; i < 255; i++) {
-		let ada;
-		if (rightSide) {
-			ada = audioDataArrayR[i] / 255;
-		} else {
-			ada = audioDataArrayL[i] / 255;
-		}
-		ctx.beginPath();
-		ctx.rect(
-			centerX - 3 * i + modifier,
-			900 - points[i] - 50,
-			1,
-			0 + points[i]
-		);
-		if (ada >= 0.8) {
-			ctx.strokeStyle = "#ff0000";
-		} else if (ada >= 0.7 && ada < 0.8) {
-			ctx.strokeStyle = "#ff038e";
-		} else if (ada >= 0.6 && ada < 0.7) {
-			ctx.strokeStyle = "#ff05ff";
-		} else if (ada >= 0.5 && ada < 0.6) {
-			ctx.strokeStyle = "#a805ff";
-		} else if (ada >= 0.4 && ada < 0.5) {
-			ctx.strokeStyle = "#2605ff";
-		} else if (ada >= 0.3 && ada < 0.4) {
-			ctx.strokeStyle = "#05a3ff";
-		} else if (ada >= 0.2 && ada < 0.3) {
-			ctx.strokeStyle = "#05ff69";
-		} else if (ada >= 0.1 && ada < 0.2) {
-			ctx.strokeStyle = "#ffee05";
-		} else {
-			ctx.strokeStyle = "#000000";
-		}
-		ctx.closePath();
-		ctx.stroke();
-	}
-}
-
-function update(dt) {
+/**
+ * get the values of each frequency
+ * get the averageFreq for RGB background color values
+ */
+function update() {
 	let audioValueLY;
 	let audioValueRY;
 	averageFreq = [0, 0, 0];
@@ -170,6 +130,9 @@ function update(dt) {
 	}
 }
 
+/**
+ * Method to draw onto the canvas
+ */
 function draw() {
 	requestAnimationFrame(draw);
 
@@ -183,19 +146,12 @@ function draw() {
 	ctx.restore();
 	ctx.save();
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	/********* DRAWING VERTICAL LINES *********/
-	// drawSquare(rectLY, "L");
-	// drawSquare(rectRY, "R");
-
-	/********* DRAWING TEXT *********/
-	// drawText(rectLY);
-	// drawText(rectRY);
 
 	/********* DRAWING SPINNING RECORD *******/
 	if (!audio.paused) {
 		newTime = audio.currentTime;
 	}
-	drawAlbumInfo();
+	drawArtistInfo();
 	drawSongInfo();
 	drawTimeUp();
 	if (!audio.paused) {
@@ -217,12 +173,18 @@ function draw() {
 	drawPlayOrPause();
 }
 
+/**
+ * Method to display either Play or Pause
+ */
 function drawPlayOrPause() {
 	const text = audio.paused ? "Click to Play!" : "Click to Pause!";
 	ctx.font = "36px serif";
 	ctx.fillText(text, centerX - 100, 50);
 }
 
+/**
+ * Method to draw the lines of colors that surround the spinning record!
+ */
 function drawRecordVisualizer() {
 	for (let i = 0; i < 255; i++) {
 		let ada = audioDataArrayL[i] / 255;
@@ -260,7 +222,7 @@ function drawRecordVisualizer() {
 }
 
 /**
- * Red circlea round the record that shows how much time is left
+ * Method to draw the Red circle around the record that shows how much time is left
  * by reducing it's arc degrees
  */
 function drawTimeLeft() {
@@ -279,6 +241,9 @@ function drawTimeLeft() {
 	ctx.stroke();
 }
 
+/**
+ * Method to draw the red line that goes in circles to represent a spinning record
+ */
 function drawRecordLine() {
 	if (!audio.paused) {
 		angle += 2;
@@ -296,6 +261,9 @@ function drawRecordLine() {
 	ctx.restore();
 }
 
+/**
+ * Method to draw the white circle at the center of the record
+ */
 function drawInnerRecord() {
 	/* center of record */
 	ctx.fillStyle = "#ffffff";
@@ -304,6 +272,9 @@ function drawInnerRecord() {
 	ctx.fill();
 }
 
+/**
+ * Method to draw the black part of the record
+ */
 function drawOuterRecord() {
 	/* vinyl part of record */
 	ctx.fillStyle = "#000000";
@@ -312,6 +283,9 @@ function drawOuterRecord() {
 	ctx.fill();
 }
 
+/**
+ * Method to draw the amount of time that has expired when playing the song.
+ */
 function drawTimeUp() {
 	// convert audio.currentTime into minutes and seconds
 	const minutes = Math.floor(audio.currentTime / 60);
@@ -326,7 +300,10 @@ function drawTimeUp() {
 	);
 }
 
-function drawAlbumInfo() {
+/**
+ * Method to draw the Artist header and name
+ */
+function drawArtistInfo() {
 	// Album Header
 	ctx.font = "36px serif";
 	ctx.fillStyle = "#ffffff";
@@ -338,6 +315,9 @@ function drawAlbumInfo() {
 	ctx.fillText(artistName, 300, 125);
 }
 
+/**
+ * Method to draw the Song header and name
+ */
 function drawSongInfo() {
 	// Song Header
 	ctx.font = "48px serif";
@@ -349,8 +329,13 @@ function drawSongInfo() {
 	ctx.fillText(songName, 300, canvas.height / 2 + 125);
 }
 
-draw();
-
+/**
+ * Change listener - when user clicks the Choose a Song button
+ * a file picker will display
+ * Once a file is chosen, the file will be loaded for audio
+ * and the jsmediatags library will parse the tags.
+ * We will then get the artist and song names so they can be displayed
+ */
 const inputFile = document.querySelector("input[type=file]");
 inputFile.addEventListener("change", (event) => {
 	let music = document.querySelector("input[type=file]").files[0];
@@ -366,5 +351,6 @@ inputFile.addEventListener("change", (event) => {
 		},
 	});
 	loadAudio(music);
-	// get the name, artist and album name
 });
+
+draw();
