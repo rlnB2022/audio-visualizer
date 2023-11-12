@@ -344,7 +344,6 @@ inputFile.addEventListener("change", (event) => {
 	let tempFile = event.target.files[0];
 	jsmediatags.read(tempFile, {
 		onSuccess: function (tag) {
-			console.log(tag.tags);
 			artistName = tag.tags.artist;
 			songName = tag.tags.title;
 		},
